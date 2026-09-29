@@ -28,6 +28,7 @@ Os scripts são carregados em ordem pelo `index.html` e compartilham o mesmo esc
 | `js/entregador.js` | App do entregador no celular |
 | `js/resultado.js` | Página "Resultado do programa" para convencer a distribuidora |
 | `js/erros.js` | Casos de erro: estoque que acaba, Pix não pago, endereço não encontrado, contestação de pontos |
+| `js/resgate.js` | Troca de pontos pelo carrinho: o prêmio entra no carrinho e o cliente escolhe entrega ou retirada antes de confirmar |
 | `js/interface.js` | Roteiro de teste, tema claro/escuro e renderização geral |
 | `js/inicio.js` | Salvamento do progresso no navegador, reinício e inicialização |
 

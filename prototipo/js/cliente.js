@@ -176,11 +176,10 @@ function vPontos(){
   </div>
   <div class="card"><h2 class="h2">Como funciona</h2><p class="sub" style="margin:4px 0 10px">Cada ${fmt(1/d.cfg.ptsPorReal)} vale 1 ponto, no app ou no caixa (informe o CPF). Pontos valem ${d.cfg.validade} meses. Indique amigos e ganhe ${n(d.cfg.indicacao)} pts.</p>
     <div class="rules"><div><b>1×</b>Bronze</div><div><b>1,25×</b>Prata · ${n(d.cfg.prata)}+</div><div><b>1,5×</b>Ouro · ${n(d.cfg.ouro)}+</div></div></div>
-  <div class="card"><h2 class="h2">Trocar pontos</h2>
-    ${d.premios.filter(r=>r.ativo).map(r=>{const ok=w.saldo>=r.custo;return `<div class="prem"><div class="tile art" style="--h:${(CAT[r.cat]||CAT.Outros).h}">${prodArt(r)}</div>
+  <div class="card"><h2 class="h2">Trocar pontos</h2><p class="sub" style="margin:2px 0 4px">O prêmio vai para o carrinho. Lá você escolhe entrega ou retirada e confirma a troca.</p>
+    ${d.premios.filter(r=>r.ativo).map(r=>{const livre=w.saldo-(S.cart.dist===d.id?premPts():0),q=S.cart.dist===d.id?premQty(r.id):0,ok=livre>=r.custo;return `<div class="prem"><div class="tile art" style="--h:${(CAT[r.cat]||CAT.Outros).h}">${prodArt(r)}</div>
       <div><div class="pname">${esc(r.nome)}</div><div class="cost num">${n(r.custo)} <span class="sub" style="font-family:var(--body);font-weight:400">pts</span></div></div>
-      <button class="sbtn" data-a="resgatar" data-v="${r.id}" ${ok?'':'disabled'}>${ok?'Trocar':'Faltam '+n(r.custo-w.saldo)}</button>
-      ${S.confirm===r.id?`<div class="confirm"><span>Trocar ${n(r.custo)} pts por <b>${esc(r.nome)}</b>? Vai na próxima entrega ou retire na loja.</span><div><button class="sbtn" style="background:var(--surface);color:var(--ink)" data-a="cancelaResg">Voltar</button><button class="sbtn ok" data-a="confirmaResg" data-v="${r.id}">Confirmar</button></div></div>`:''}</div>`}).join('')||'<p class="sub">Esta distribuidora ainda não cadastrou prêmios.</p>'}</div>
+      ${q?`<button class="sbtn soft" data-a="tab" data-v="carrinho">No carrinho · ${q}</button>`:`<button class="sbtn" data-a="resgatar" data-v="${r.id}" ${ok?'':'disabled'}>${ok?'Trocar':'Faltam '+n(r.custo-livre)}</button>`}</div>`}).join('')||'<p class="sub">Esta distribuidora ainda não cadastrou prêmios.</p>'}</div>
   <div class="card"><h2 class="h2">Extrato</h2>
     ${w.extrato.map(e=>`<div class="ext num"><span><span class="sub">${e.d}</span> · ${esc(e.desc)}</span><span class="${e.pts>=0?'plus':'minus'}">${e.pts>=0?'+':''}${n(e.pts)}</span></div>`).join('')||'<p class="sub">Sem movimentações.</p>'}</div>`;
 }
@@ -260,7 +259,7 @@ function renderApp(reset){
   if(!S.sess){el.innerHTML=`${OS()}<div class="scr auth-scr${E}">${S.showTermos?vTermos():vAuth()}</div><i class="homebar"></i>`;return;}
   if(S.atab==='pix'&&!S.pixPend)S.atab='carrinho';
   const inLoja=['loja','carrinho','pix'].includes(S.atab),d=inLoja?S.dists[S.atab==='loja'?S.adist:(S.atab==='pix'?S.pixPend.dist:S.cart.dist)]:null;
-  const items=cartItems(),qn=items.reduce((a,b)=>a+b.qty,0),tot=myWallets().reduce((a,w)=>a+w.saldo,0),unread=(S.notifs[S.sess]||[]).filter(x=>!x.lida).length,ativos=meusAtivos().length;
+  const items=cartItems(),qn=items.reduce((a,b)=>a+b.qty,0)+premCount(),tot=myWallets().reduce((a,w)=>a+w.saldo,0),unread=(S.notifs[S.sess]||[]).filter(x=>!x.lida).length,ativos=meusAtivos().length;
   const views={inicio:vInicio,loja:vLoja,carrinho:vCarrinho,pix:vPix,pontos:vPontos,pedidos:vPedidos,perfil:vPerfil,notifs:vNotifs};
   const bell=`<button class="circ" data-a="tab" data-v="notifs" aria-label="Avisos${unread?` (${unread} novos)`:''}" style="position:relative">${svgI('bell')}${unread?`<span class="dot" style="position:absolute;top:-4px;right:-4px;background:var(--accent);color:#fff;border-radius:99px;font-size:10px;font-weight:700;min-width:17px;height:17px;display:grid;place-items:center;padding:0 4px">${unread}</span>`:''}</button>`;
   const head=d?`<header class="ahead store" style="--dc:${d.cor}">${OS()}<div class="row"><div class="stitle"><button class="circ" data-a="${S.atab==='loja'?'tab':'abrirDist'}" data-v="${S.atab==='loja'?'inicio':d.id}" aria-label="Voltar">‹</button><div class="logo">${esc(d.nome)}<small>${lojaTxt(d)}</small></div></div>
@@ -269,7 +268,7 @@ function renderApp(reset){
       ${S.atab==='inicio'?`<button class="addrbtn" data-a="editEnd">${PIN}<span>${!S.endAtual?'Informe o endereço de entrega':S.endAtual.retirada?'Vou retirar na loja':'Entregar em <b>'+esc(S.endAtual.rua)+(S.endAtual.comp?', '+esc(S.endAtual.comp):'')+', '+esc(S.endAtual.bairro)+'</b>'}</span><em>${S.endAtual?'Alterar':'Definir'}</em></button>`:''}</header>`;
   const navOn=inLoja?'inicio':S.atab,badge={pedidos:ativos};
   el.innerHTML=`${head}<div class="scr${E}">${S.showTermos?vTermos():views[S.atab]()}</div>
-  ${qn&&(S.atab==='loja'||S.atab==='inicio')?`<button class="cartbar" data-a="tab" data-v="carrinho"><span><span class="cq num">${qn}</span><span>Ver carrinho<small>${esc(S.dists[S.cart.dist].nome.split(' ').slice(0,2).join(' '))} · +${n(calcPts(S.cart.dist,items,W(S.cart.dist,S.sess)))} pts</small></span></span><span class="num">${fmt(sub(items))}</span></button>`:''}
+  ${qn&&(S.atab==='loja'||S.atab==='inicio')?`<button class="cartbar" data-a="tab" data-v="carrinho"><span><span class="cq num">${qn}</span><span>Ver carrinho<small>${esc(S.dists[S.cart.dist].nome.split(' ').slice(0,2).join(' '))} · ${items.length?'+'+n(calcPts(S.cart.dist,items,W(S.cart.dist,S.sess)))+' pts':'troca de pontos'}</small></span></span><span class="num">${items.length?fmt(sub(items)):'−'+n(premPts())+' pts'}</span></button>`:''}
   <nav class="nav">${[['inicio','Início'],['pedidos','Pedidos'],['pontos','Pontos'],['perfil','Perfil']].map(([k,l])=>`<button data-a="tab" data-v="${k}" class="${navOn===k?'on':''}" ${navOn===k?'aria-current="page"':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">${NAVI[k]}</svg>${l}${badge[k]?`<span class="nb num">${badge[k]}</span>`:''}</button>`).join('')}</nav><i class="homebar"></i>`;
   if(S.editEnd)el.insertAdjacentHTML('beforeend',`<div class="sheet-bg" data-a="editEnd" data-v="0"></div><div class="sheet" role="dialog" aria-label="Endereço de entrega">${vEndereco()}</div>`);
   if(!anim)el.querySelector('.scr').scrollTop=reset?0:top;

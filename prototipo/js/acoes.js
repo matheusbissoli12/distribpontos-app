@@ -63,12 +63,6 @@ const ACT={
   pixOk:()=>{const o=S.pixPend;S.pixPend=null;o.hora=now();criarPedido(o);mkRec(o);S.cart={dist:null,items:{}};S.atab='pedidos';S.pd=o.dist;S.ptab='pedidos';S.pfilt='abertos';
     notify(o.cpf,`Pix de ${fmt(o.total)} aprovado. Pedido #${o.id} enviado para ${S.dists[o.dist].nome}.`);render(true);toast(`Pix aprovado · pedido #${o.id} enviado`);},
   pixCancel:()=>{S.pixPend=null;S.atab='carrinho';renderApp(true)},
-  resgatar:v=>{S.confirm=v;renderApp()},
-  cancelaResg:()=>{S.confirm=null;renderApp()},
-  confirmaResg:v=>{const d=S.dists[S.pwal],r=d.premios.find(x=>x.id===v),w=W(d.id,S.sess);if(w.saldo<r.custo)return;w.saldo-=r.custo;const id=++S.seq;
-    w.extrato.unshift({d:'hoje',desc:'Resgate · '+r.nome,pts:-r.custo});if(w.vencendo){w.vencendo.pts-=Math.min(w.vencendo.pts,r.custo);if(w.vencendo.pts<=0)w.vencendo=null;}
-    criarPedido({id,dist:d.id,cpf:S.sess,canal:'app',tipo:'resgate',itensTxt:r.nome,total:0,pts:r.custo,status:'novo',hora:now(),dia:'hoje',entrega:S.endAtual&&!S.endAtual.retirada?'entrega':'retirada',end:S.endAtual&&!S.endAtual.retirada?{...S.endAtual}:null});
-    S.confirm=null;render();toast(`Troca confirmada: ${r.nome}`);},
   salvarEnd:()=>{const b=val('en-bairro'),r=val('en-rua').trim(),c=val('en-comp').trim();S.endErr='';
     if(!b)S.endErr='Selecione o bairro.';else if(r.length<4)S.endErr='Informe rua e número.';if(S.endErr)return renderApp();
     S.endAtual={bairro:b,rua:r,comp:c};S.editEnd=false;S.entrega='entrega';if(S.cart.dist&&!area(S.dists[S.cart.dist],b))S.entrega='retirada';renderApp();toast(`Entregar em ${r}, ${b}`);},
