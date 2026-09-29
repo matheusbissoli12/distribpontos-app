@@ -1,0 +1,47 @@
+<title>Protótipo DistribPontos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/acabamento.css">
+<header class="top">
+  <div class="brand"><h1>Distrib<b>Pontos</b></h1><span class="ver">Protótipo 2</span><span>App multi-distribuidora com fidelidade por CPF</span></div>
+  <div class="topr">
+    <label class="clock" for="clock-sel">Hora simulada
+      <select id="clock-sel"><option value="650">10:50 · manhã</option><option value="1170">19:30 · noite</option><option value="1410">23:30 · madrugada</option></select></label>
+    <div class="seg" id="viewseg">
+      <button class="only-narrow" data-a="view" data-v="app">App do cliente</button>
+      <button data-a="view" data-v="dist">Painel da distribuidora</button>
+      <button data-a="view" data-v="admin">Admin da plataforma</button>
+    </div>
+    <div class="savebox"><button class="resetbtn" id="resetbtn" data-a="reset">Reiniciar demonstração</button><span class="sub" id="savedtxt">Progresso salvo neste navegador</span></div>
+    <button class="themebtn" id="themebtn" data-a="theme" aria-label="Alternar tema"></button>
+  </div>
+</header>
+
+<section class="guide" id="guide" aria-label="Roteiro de teste"></section>
+
+<main class="stage" id="stage" data-view="app">
+  <section class="acol">
+    <div class="phonemode" id="phonemode"></div>
+    <div class="phone" id="phone"></div>
+  </section>
+  <section class="pcol">
+    <p class="col-label" id="rlabel">Painel da distribuidora</p>
+    <div class="panel" id="panel"></div>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" hidden></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="js/base.js"></script>
+<script src="js/cliente.js"></script>
+<script src="js/painel.js"></script>
+<script src="js/historico.js"></script>
+<script src="js/importar.js"></script>
+<script src="js/acoes.js"></script>
+<script src="js/realismo.js"></script>
+<script src="js/entregador.js"></script>
+<script src="js/resultado.js"></script>
+<script src="js/erros.js"></script>
+<script src="js/interface.js"></script>
+<script src="js/inicio.js"></script>
