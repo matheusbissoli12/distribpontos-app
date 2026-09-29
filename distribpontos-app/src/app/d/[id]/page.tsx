@@ -48,6 +48,7 @@ export default function Loja({ params }: { params: { id: string } }) {
   const area = bairroId ? areas.find((a) => a.bairro_id === bairroId) : undefined;
   const itensAqui = cart.distId === d.id ? cart.items : {};
   const qn = Object.values(itensAqui).reduce((a, b) => a + b, 0);
+  const qp = cart.distId === d.id ? Object.values(cart.premios ?? {}).reduce((a, b) => a + b, 0) : 0;
   const subtotal = Object.entries(itensAqui).reduce((s, [id, q]) => s + (prods.find((p) => p.id === id)?.preco ?? 0) * q, 0);
 
   function add(p: Product, delta: number) {
@@ -92,10 +93,10 @@ export default function Loja({ params }: { params: { id: string } }) {
           );
         })}
       </div>
-      {qn > 0 && (
+      {qn + qp > 0 && (
         <Link className="cartbar" href="/carrinho">
-          <span>Ver carrinho<small>{qn} {qn > 1 ? 'itens' : 'item'}</small></span>
-          <span className="num">{brl(subtotal)}</span>
+          <span>Ver carrinho<small>{qn > 0 && `${qn} ${qn > 1 ? 'itens' : 'item'}`}{qn > 0 && qp > 0 && ' + '}{qp > 0 && `${qp} ${qp > 1 ? 'prêmios' : 'prêmio'}`}</small></span>
+          <span className="num">{qn > 0 ? brl(subtotal) : 'Troca de pontos'}</span>
         </Link>
       )}
     </AppShell>

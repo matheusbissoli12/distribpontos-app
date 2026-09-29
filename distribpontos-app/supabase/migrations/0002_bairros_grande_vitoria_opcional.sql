@@ -1,4 +1,5 @@
--- Bairros atendidos (edite à vontade pelo painel admin ou aqui)
+-- OPCIONAL: bairros da Grande Vitória (ES). Rode só se for atender essa região.
+-- Sem este arquivo o app começa sem bairros: cadastre os seus em Admin › Bairros.
 insert into public.bairros (nome, cidade) values
  ('Jardim Camburi','Vitória'),('Jardim da Penha','Vitória'),('Mata da Praia','Vitória'),('Praia do Canto','Vitória'),
  ('Bento Ferreira','Vitória'),('Centro','Vitória'),('Enseada do Suá','Vitória'),('Santa Lúcia','Vitória'),('Maruípe','Vitória'),

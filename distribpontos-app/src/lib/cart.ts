@@ -2,7 +2,8 @@
 import { useSyncExternalStore } from 'react';
 
 /** Carrinho (localStorage) e endereço da sessão (sessionStorage: não fica pré-definido). */
-export type Cart = { distId: string | null; items: Record<string, number> };
+/** items: produtos (id → quantidade); premios: prêmios trocados com pontos (id → quantidade). */
+export type Cart = { distId: string | null; items: Record<string, number>; premios?: Record<string, number> };
 export type Endereco = { retirada: true } | { retirada?: false; bairro_id: number; bairro: string; cidade: string; rua: string; comp: string };
 
 const CART_KEY = 'dp_cart_v1';
@@ -67,8 +68,10 @@ export function addToCart(distId: string, productId: string, delta: number, max:
   const c = getCart();
   let res: 'ok' | 'trocou' | 'limite' = 'ok';
   let items = c.items;
-  if (c.distId && c.distId !== distId && Object.keys(c.items).length) {
+  let premios = c.premios ?? {};
+  if (c.distId && c.distId !== distId && cartCount(c)) {
     items = {};
+    premios = {};
     res = 'trocou';
   }
   const q = (items[productId] ?? 0) + delta;
@@ -76,6 +79,30 @@ export function addToCart(distId: string, productId: string, delta: number, max:
   const next = { ...items };
   if (q <= 0) delete next[productId];
   else next[productId] = q;
-  setCart({ distId: Object.keys(next).length ? distId : null, items: next });
+  setCart({ distId: Object.keys(next).length || Object.keys(premios).length ? distId : null, items: next, premios });
+  return res;
+}
+
+/** Total de unidades no carrinho (produtos + prêmios). */
+export const cartCount = (c: Cart) =>
+  Object.values(c.items).reduce((a, b) => a + b, 0) + Object.values(c.premios ?? {}).reduce((a, b) => a + b, 0);
+
+/** Coloca (ou tira) um prêmio no carrinho. O saldo é conferido por quem chama e de novo no servidor. */
+export function addRewardToCart(distId: string, rewardId: string, delta: number): 'ok' | 'trocou' {
+  const c = getCart();
+  let res: 'ok' | 'trocou' = 'ok';
+  let items = c.items;
+  let premios = c.premios ?? {};
+  if (c.distId && c.distId !== distId && cartCount(c)) {
+    items = {};
+    premios = {};
+    res = 'trocou';
+  }
+  const q = (premios[rewardId] ?? 0) + delta;
+  const next = { ...premios };
+  if (q <= 0) delete next[rewardId];
+  else next[rewardId] = q;
+  const vazio = !Object.keys(items).length && !Object.keys(next).length;
+  setCart({ distId: vazio ? null : distId, items, premios: next });
   return res;
 }

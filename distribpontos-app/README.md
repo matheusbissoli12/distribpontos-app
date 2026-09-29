@@ -8,6 +8,27 @@ App de pedidos com programa de pontos por CPF para várias distribuidoras, no mo
 
 Tecnologia: Next.js 14 (App Router) + Supabase (Postgres, login e tempo real) + Mercado Pago (Pix) + Twilio (SMS). Hospedagem: Vercel.
 
+**O app começa vazio.** Não vem nenhuma distribuidora, produto, cliente ou bairro cadastrado. Você cadastra tudo pelo Admin depois de publicar.
+
+**Um só projeto, dois jeitos de usar:**
+
+| Quem | Endereço (exemplo) | Como usa |
+|---|---|---|
+| Cliente | `app.suaempresa.com.br` | App instalável no celular (Android e iPhone) |
+| Distribuidora | `painel.suaempresa.com.br` (ou `/painel`) | Site, no computador ou no celular |
+| Você (admin) | `admin.suaempresa.com.br` (ou `/admin`) | Site |
+
+Os três endereços apontam para o mesmo projeto na Vercel. Quem abre `painel.` ou `admin.` cai direto na área certa.
+
+### Checklist de lançamento
+
+1. Supabase: rodar `0001_schema.sql` e `0003_agendamentos_opcional.sql`, ativar login por SMS (Twilio) e por e-mail, criar seu usuário admin (seção 2).
+2. Vercel: publicar com todas as variáveis do `.env.example`, incluindo os dados da empresa para os Termos (seção 3).
+3. Domínio: apontar `app.`, `painel.` e `admin.` para a Vercel e atualizar `NEXT_PUBLIC_SITE_URL` e as URLs do Supabase.
+4. Admin: cadastrar os bairros atendidos e a primeira distribuidora (seção 4).
+5. Rodar o roteiro de teste (seção 6) com um pedido real de valor baixo.
+6. Revisar os Termos com um advogado.
+
 ---
 
 ## 1. O que você vai precisar (contas)
@@ -27,7 +48,7 @@ Tecnologia: Next.js 14 (App Router) + Supabase (Postgres, login e tempo real) + 
 1. Crie um projeto no Supabase. Região: **South America (São Paulo)**.
 2. Abra **SQL Editor** e rode, nesta ordem, o conteúdo de:
    - `supabase/migrations/0001_schema.sql` (tabelas, segurança e regras)
-   - `supabase/migrations/0002_bairros.sql` (bairros da Grande Vitória; edite à vontade)
+   - Opcional: `supabase/migrations/0002_bairros_grande_vitoria_opcional.sql`, só se for atender a Grande Vitória (ES). Sem ele, o app começa sem bairros e você cadastra os seus em **Admin › Bairros**.
 3. Tarefas automáticas (recomendado): em **Database › Extensions**, ative **pg_cron** e rode `supabase/migrations/0003_agendamentos_opcional.sql`. Isso cancela Pix não pagos em 30 minutos (devolvendo o estoque) e baixa pontos vencidos todo dia.
 4. Em **Project Settings › API**, copie: `Project URL`, `anon public` e `service_role` (esta é secreta).
 
@@ -72,6 +93,8 @@ on conflict (id) do update set is_admin = true;
 | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM` | do Twilio (número que envia o SMS do balcão) |
 | `CRON_SECRET` | um texto aleatório longo |
 | `SMS_DEV_MODE` | `false` em produção (`true` só para testar o balcão sem SMS) |
+| `NEXT_PUBLIC_EMPRESA_NOME`, `NEXT_PUBLIC_EMPRESA_CNPJ`, `NEXT_PUBLIC_EMPRESA_ENDERECO` | Razão social, CNPJ e endereço, exibidos nos Termos |
+| `NEXT_PUBLIC_EMAIL_SUPORTE`, `NEXT_PUBLIC_EMAIL_PRIVACIDADE` | E-mails de suporte e do encarregado de dados (LGPD) |
 
 4. **Deploy**. Depois, volte ao Supabase e confira se a Site URL bate com o endereço final.
 5. Domínio próprio (opcional): em **Vercel › Settings › Domains**, adicione, por exemplo, `app.suaempresa.com.br`, e atualize `NEXT_PUBLIC_SITE_URL` e as URLs do Supabase.
@@ -88,6 +111,7 @@ npm run dev                  # abre em http://localhost:3000
 
 ## 4. Colocar a primeira distribuidora no ar
 
+0. Em **Admin › Bairros**, cadastre os bairros que o app vai atender. Os clientes escolhem o endereço nessa lista, e as distribuidoras montam a área de entrega com ela.
 1. Entre em `/painel/login` com seu e-mail de admin e abra **Admin da plataforma**.
 2. Em **Novo contrato**, preencha os dados e o e-mail do dono. Ele recebe um convite para criar a senha.
 3. O dono entra em `/painel` e, em **Configurações**, define horário, área de entrega (bairros e taxa), equipe e **Pix** (cola o Access Token do Mercado Pago da loja). Em **Catálogo** cadastra ou importa os produtos. Em **Pontos e prêmios**, define a regra e os prêmios.
@@ -107,6 +131,8 @@ npm run dev                  # abre em http://localhost:3000
 - **Android (Chrome):** abra o site › menu ⋮ › **Instalar app**.
 - **iPhone (Safari):** abra o site › Compartilhar › **Adicionar à Tela de Início**.
 
+- **Play Store (opcional):** o app já é um PWA. Para publicar na Play Store, gere o pacote Android em [pwabuilder.com](https://www.pwabuilder.com) com o endereço do app e envie pelo Google Play Console (conta de desenvolvedor paga uma vez). A App Store da Apple exige um app nativo e fica para depois.
+
 Mande o link para os clientes com um cartaz no balcão: “Informe seu CPF no caixa e ganhe pontos. Baixe o app: app.suaempresa.com.br”.
 
 ---
@@ -117,7 +143,7 @@ Mande o link para os clientes com um cartaz no balcão: “Informe seu CPF no ca
 2. Painel (caixa): Iniciar separação › Despachar (escolhendo o entregador) › entregador confirma a entrega. Confira os pontos no app do cliente.
 3. Pix: com um token de produção, faça um pedido de valor baixo, pague e veja o pedido aparecer no painel sozinho.
 4. Balcão: lance uma compra para um CPF **sem cadastro**, confirme com o código do SMS e depois cadastre esse CPF no app. Os pontos devem aparecer.
-5. Resgate: troque pontos por um prêmio, retirando na loja.
+5. Resgate: na carteira de pontos, toque em **Trocar**. O prêmio vai para o carrinho; escolha retirar na loja e confirme a troca. Repita levando um produto junto.
 6. Loja fechada: mude o horário no painel e confira que o app não aceita pedido.
 7. Permissões: entre como caixa e como entregador e confira que cada um só vê o que deve.
 
@@ -130,7 +156,7 @@ Mande o link para os clientes com um cartaz no balcão: “Informe seu CPF no ca
 - O token do Mercado Pago e os códigos do balcão ficam em tabelas que só o servidor acessa.
 - O código do balcão expira em 10 minutos, aceita no máximo 5 tentativas e é guardado criptografado.
 - A loja vê o CPF mascarado. O cliente aceita os termos no cadastro e pode pedir cópia ou exclusão dos dados no Perfil (você atende pelo Admin, em até 15 dias).
-- Antes de lançar: preencha `src/app/termos/page.tsx` com os dados da sua empresa e **revise o texto com um advogado**.
+- Antes de lançar: preencha as variáveis `NEXT_PUBLIC_EMPRESA_*` e `NEXT_PUBLIC_EMAIL_*` (os Termos mostram um aviso enquanto faltarem) e **revise o texto com um advogado**.
 
 ---
 

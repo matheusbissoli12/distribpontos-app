@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { createClient, type SupabaseClient, type User } from '@supabase/supabase-js';
 
 /** Cliente com a sessão do usuário (cookies) — para rotas de API. */
@@ -10,7 +10,7 @@ export function sbServer(): SupabaseClient {
       getAll() {
         return store.getAll();
       },
-      setAll(list) {
+      setAll(list: { name: string; value: string; options: CookieOptions }[]) {
         try {
           list.forEach(({ name, value, options }) => store.set(name, value, options));
         } catch {

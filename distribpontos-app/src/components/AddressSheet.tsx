@@ -32,6 +32,7 @@ export function AddressSheet({ onClose }: { onClose: () => void }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <h2 className="h2">Onde vamos entregar?</h2>
           <p className="sub" style={{ margin: 0 }}>Informe o endereço deste pedido para ver as distribuidoras que atendem você.</p>
+          {bairros.length === 0 && <div className="alert">Ainda não atendemos nenhum bairro. Enquanto isso, você pode retirar os pedidos na loja.</div>}
           <label className="lbl">
             Bairro
             <select className="inp" value={bairroId} onChange={(ev) => setBairroId(ev.target.value)}>

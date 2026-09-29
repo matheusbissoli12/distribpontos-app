@@ -2,6 +2,16 @@ import Link from 'next/link';
 
 export const metadata = { title: 'Termos e privacidade · DistribPontos' };
 
+/* Dados da empresa: configure nas variáveis de ambiente (veja .env.example). */
+const EMPRESA = {
+  nome: process.env.NEXT_PUBLIC_EMPRESA_NOME,
+  cnpj: process.env.NEXT_PUBLIC_EMPRESA_CNPJ,
+  endereco: process.env.NEXT_PUBLIC_EMPRESA_ENDERECO,
+  suporte: process.env.NEXT_PUBLIC_EMAIL_SUPORTE,
+  privacidade: process.env.NEXT_PUBLIC_EMAIL_PRIVACIDADE || process.env.NEXT_PUBLIC_EMAIL_SUPORTE,
+};
+const faltaDado = !EMPRESA.nome || !EMPRESA.cnpj || !EMPRESA.suporte;
+
 export default function Termos() {
   return (
     <div className="shell">
@@ -10,7 +20,7 @@ export default function Termos() {
       </header>
       <main className="scr">
         <div className="card legal">
-          <p className="sub">Modelo inicial. Revise com um advogado e preencha os dados da sua empresa antes de publicar.</p>
+          {faltaDado && <p className="err">Dados da empresa não configurados. Preencha as variáveis NEXT_PUBLIC_EMPRESA_* e NEXT_PUBLIC_EMAIL_* antes de publicar, e revise este texto com um advogado.</p>}
           <h3>1. Quem somos</h3>
           <p>O DistribPontos é uma plataforma que conecta clientes a distribuidoras parceiras para pedidos e programa de pontos. Cada distribuidora é responsável pelos produtos, preços, entregas, notas fiscais e prêmios que oferece.</p>
           <h3>2. Programa de pontos</h3>
@@ -27,9 +37,9 @@ export default function Termos() {
           <h3>5. Com quem compartilhamos</h3>
           <p>Somente com a distribuidora em que você compra, que vê seu nome, celular e endereço do pedido, com o CPF parcialmente mascarado. Pagamentos Pix são processados pelo Mercado Pago. Não vendemos seus dados.</p>
           <h3>6. Seus direitos</h3>
-          <p>Você pode pedir cópia, correção ou exclusão dos seus dados em Perfil › Privacidade, ou pelo e-mail do encarregado de dados: [e-mail do encarregado]. Respondemos em até 15 dias.</p>
+          <p>Você pode pedir cópia, correção ou exclusão dos seus dados em Perfil › Privacidade, ou pelo e-mail do encarregado de dados: {EMPRESA.privacidade ?? '[e-mail do encarregado]'}. Respondemos em até 15 dias.</p>
           <h3>7. Contato</h3>
-          <p>[Razão social] · CNPJ [número] · [endereço] · [e-mail de suporte]</p>
+          <p>{EMPRESA.nome ?? '[Razão social]'} · CNPJ {EMPRESA.cnpj ?? '[número]'}{EMPRESA.endereco ? ` · ${EMPRESA.endereco}` : ''} · {EMPRESA.suporte ?? '[e-mail de suporte]'}</p>
         </div>
       </main>
     </div>

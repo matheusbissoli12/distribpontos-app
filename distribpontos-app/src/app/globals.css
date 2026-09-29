@@ -128,7 +128,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .sbtn{padding:7px 12px;border-radius:9px;background:var(--accent);color:#fff;font-weight:600;font-size:12.5px;white-space:nowrap}
 .sbtn[disabled]{background:var(--surface2);color:var(--muted);cursor:not-allowed}
 .sbtn.ok{background:var(--ok)}
-.sbtn.soft{background:var(--info-soft);color:var(--primary)}
+.sbtn.soft{background:var(--info-soft);color:var(--primary);text-decoration:none}
 .confirm{grid-column:1/-1;background:var(--accent-soft);border-radius:10px;padding:10px;display:flex;gap:8px;align-items:center;justify-content:space-between;font-size:12.5px;flex-wrap:wrap}
 .confirm div{display:flex;gap:6px}
 .ext{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:13px}

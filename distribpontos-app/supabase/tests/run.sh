@@ -7,5 +7,5 @@ $P -c "drop database if exists dp_test" >/dev/null
 $P -c "create database dp_test" >/dev/null
 $P -d dp_test -f tests/00_supabase_stub.sql >/dev/null
 $P -d dp_test -f migrations/0001_schema.sql 2>&1 | grep -v NOTICE || true
-$P -d dp_test -f migrations/0002_bairros.sql >/dev/null
+$P -d dp_test -f migrations/0002_bairros_grande_vitoria_opcional.sql >/dev/null
 $P -d dp_test -f tests/10_fluxos.sql 2>&1 | sed 's/^psql:[^:]*:[0-9]*: NOTICE:  //' | grep -v '^$'

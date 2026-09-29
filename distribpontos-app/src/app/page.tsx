@@ -66,7 +66,7 @@ export default function Home() {
       ) : !bairroId ? (
         <>
           <h2 className="h2">Distribuidoras parceiras</h2>
-          <div className="list">{outras.length ? outras.map((d) => card(d, end?.retirada ? 'retirada' : 'neutro')) : <Empty>Nenhuma distribuidora encontrada.</Empty>}</div>
+          <div className="list">{outras.length ? outras.map((d) => card(d, end?.retirada ? 'retirada' : 'neutro')) : q.trim() ? <Empty>Nenhuma distribuidora encontrada.</Empty> : <Empty><b>Em breve, as distribuidoras da sua região.</b><br />Estamos fechando as primeiras parcerias. Crie sua conta agora: seu CPF já vira seu cartão fidelidade.</Empty>}</div>
         </>
       ) : (
         <>
