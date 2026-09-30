@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { createClient, type SupabaseClient, type User } from '@supabase/supabase-js';
 
@@ -30,8 +30,13 @@ export function sbAdmin(): SupabaseClient {
   });
 }
 
-/** Usuário logado da requisição (ou null). */
+/** Usuário logado da requisição (ou null). Aceita o cookie do site ou o token "Bearer" enviado pelo app nativo. */
 export async function currentUser(): Promise<User | null> {
+  const auth = headers().get('authorization');
+  if (auth?.startsWith('Bearer ')) {
+    const { data } = await sbAdmin().auth.getUser(auth.slice(7));
+    return data.user ?? null;
+  }
   const { data } = await sbServer().auth.getUser();
   return data.user ?? null;
 }

@@ -668,6 +668,9 @@ $$;
 -- ---------------------------------------------------------------------
 revoke execute on all functions in schema public from public, anon;
 grant execute on function public.cpf_valid(text), public.store_open(uuid) to anon, authenticated;
+-- Usadas nas regras de leitura de lojas, produtos e prêmios, que valem também para visitantes sem login
+-- (para quem não está logado, sempre respondem "não é membro" / "não é admin").
+grant execute on function public.member_role(uuid), public.is_admin() to anon;
 grant execute on function public.my_cpf(), public.is_admin(), public.member_role(uuid),
   public.complete_profile(text, text, text, boolean, boolean), public.place_order(uuid, jsonb, text, jsonb, text),
   public.advance_order(bigint, uuid), public.cancel_order(bigint, text), public.redeem_reward(uuid, text, jsonb),
