@@ -2,15 +2,9 @@ import { ScrollView, View } from 'react-native';
 import { SimpleHead } from '@/components/AppShell';
 import { Box, Card, Txt } from '@/components/ui';
 import { useColors } from '@/lib/theme';
+import { EMPRESA } from '@/config';
 
-/* Dados da empresa: configure no .env (veja .env.example). */
-const EMPRESA = {
-  nome: process.env.EXPO_PUBLIC_EMPRESA_NOME,
-  cnpj: process.env.EXPO_PUBLIC_EMPRESA_CNPJ,
-  endereco: process.env.EXPO_PUBLIC_EMPRESA_ENDERECO,
-  suporte: process.env.EXPO_PUBLIC_EMAIL_SUPORTE,
-  privacidade: process.env.EXPO_PUBLIC_EMAIL_PRIVACIDADE || process.env.EXPO_PUBLIC_EMAIL_SUPORTE,
-};
+/* Dados da empresa: configure em src/config.ts. */
 const faltaDado = !EMPRESA.nome || !EMPRESA.cnpj || !EMPRESA.suporte;
 
 function H({ children }: { children: string }) {
@@ -30,7 +24,7 @@ export default function Termos() {
       <SimpleHead title="Termos e privacidade" back="/" />
       <ScrollView contentContainerStyle={{ padding: 14, width: '100%', maxWidth: 640, alignSelf: 'center' }}>
         <Card style={{ gap: 6 }}>
-          {faltaDado && <Box tone="err">Dados da empresa não configurados. Preencha as variáveis EXPO_PUBLIC_EMPRESA_* e EXPO_PUBLIC_EMAIL_* antes de publicar, e revise este texto com um advogado.</Box>}
+          {faltaDado && <Box tone="err">Dados da empresa não configurados. Preencha os dados da empresa em src/config.ts antes de publicar, e revise este texto com um advogado.</Box>}
           <H>1. Quem somos</H>
           <P>O DistribPontos é uma plataforma que conecta clientes a distribuidoras parceiras para pedidos e programa de pontos. Cada distribuidora é responsável pelos produtos, preços, entregas, notas fiscais e prêmios que oferece.</P>
           <H>2. Programa de pontos</H>
