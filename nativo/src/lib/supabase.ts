@@ -1,12 +1,11 @@
 import './storage';
 import { AppState, Platform } from 'react-native';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { API_URL, SUPABASE_ANON_KEY, SUPABASE_URL } from '@/config';
 
-const url = SUPABASE_URL;
-const key = SUPABASE_ANON_KEY;
+const url = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
+const key = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
 
-/** true quando src/config.ts (ou o .env) ainda não foi preenchido. */
+/** true quando o .env ainda não foi preenchido. */
 export const supabaseMissing = !url || !key;
 
 let client: SupabaseClient | null = null;
@@ -27,11 +26,11 @@ export function sb(): SupabaseClient {
   return client;
 }
 
-const API = API_URL;
+const API = (process.env.EXPO_PUBLIC_API_URL ?? '').replace(/\/$/, '');
 
 /** Chama uma rota do backend (Next.js na Vercel) enviando o login do usuário. */
 export async function api<T = Record<string, unknown>>(path: string, init: { method?: string; body?: unknown; query?: Record<string, string | number> } = {}): Promise<{ ok: boolean; data: T & { error?: string } }> {
-  if (!API) return { ok: false, data: { error: 'Servidor não configurado: preencha apiUrl em src/config.ts.' } as T & { error?: string } };
+  if (!API) return { ok: false, data: { error: 'Servidor não configurado (EXPO_PUBLIC_API_URL).' } as T & { error?: string } };
   const { data } = await sb().auth.getSession();
   const qs = init.query ? '?' + new URLSearchParams(Object.entries(init.query).map(([k, v]) => [k, String(v)])).toString() : '';
   try {

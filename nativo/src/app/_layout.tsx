@@ -32,7 +32,7 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <View style={{ flex: 1, backgroundColor: c.bg, justifyContent: 'center', padding: 24, gap: 12 }}>
           <Txt k="h1">Configuração pendente</Txt>
-          <Box tone="alert">Abra o arquivo nativo/src/config.ts, preencha supabaseUrl e supabaseAnonKey (Supabase › Project Settings › API) e reinicie o Expo.</Box>
+          <Box tone="alert">Crie o arquivo .env na pasta nativo (copie o .env.example) com EXPO_PUBLIC_SUPABASE_URL e EXPO_PUBLIC_SUPABASE_ANON_KEY e reinicie o Expo.</Box>
         </View>
       </SafeAreaProvider>
     );
